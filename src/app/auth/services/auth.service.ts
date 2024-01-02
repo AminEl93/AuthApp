@@ -1,9 +1,9 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from 'src/environments/environments';
-import { Observable, catchError, map, tap, throwError } from 'rxjs';
+import { Observable, catchError, map, of, tap, throwError } from 'rxjs';
 
-import { AuthStatus, LoginResponse, User } from '../interfaces';
+import { User, LoginResponse, AuthStatus, CheckTokenResponse } from '../interfaces';
 
 @Injectable({
     providedIn: 'root'
@@ -24,20 +24,40 @@ export class AuthService {
 
     constructor() { }
     
+    // Establecer la autenticación de un usuario
+    private setAuthentication(user: User, token: string): boolean {
+        this._currentUser.set(user);
+        this._authStatus.set(AuthStatus.authenticated);
+        localStorage.setItem('token', token);    
+        return true;
+    }    
+
     login(email: string, password: string): Observable<boolean> {
         const url = `${this.baseUrl}/auth/login`;
         const body = { email, password };
-
         return this._http.post<LoginResponse>(url, body)
             .pipe(
-                tap( ({user, token}) => {
-                    this._currentUser.set(user);
-                    this._authStatus.set(AuthStatus.authenticated);
-                    localStorage.setItem('token', token);
-                    console.log({user, token});
-                }),
-                map( () => true ),
+                map( ({ user, token }) => this.setAuthentication(user, token) ),
                 catchError( err => throwError(() => err.error.message) )
+            );
+    }
+
+    // Verificación del token de acceso para ver si un usuario está autenticado correctamente
+    checkAuthStatus(): Observable<boolean> {
+        const url = `${this.baseUrl}/auth/check-token`;
+        const token = localStorage.getItem('token');
+
+        if (!token) return of(false);
+
+        const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    
+        return this._http.get<CheckTokenResponse>(url, { headers })
+            .pipe(
+                map( ({ user, token }) => this.setAuthentication(user, token) ),
+                catchError(() => {
+                    this._authStatus.set(AuthStatus.notAuthenticated);
+                    return of(false);
+                })
             );
     }
 }
