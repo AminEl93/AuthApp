@@ -5,7 +5,6 @@ import Swal from 'sweetalert2';
 
 import { AuthService } from '../../services/auth.service';
 
-
 @Component({
     templateUrl: './login-page.component.html'
 })

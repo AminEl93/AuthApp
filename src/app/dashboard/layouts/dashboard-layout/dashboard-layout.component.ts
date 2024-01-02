@@ -1,9 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
+import { AuthService } from 'src/app/auth/services/auth.service';
 
 @Component({
     templateUrl: './dashboard-layout.component.html'
 })
 
-export class DashboardLayoutComponent {
-
+export class DashboardLayoutComponent {    
+    private _authService = inject(AuthService);
+    public user = computed(() => this._authService.currentUser());
 }
