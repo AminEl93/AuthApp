@@ -343,6 +343,19 @@ button:hover {
   background-color: grey;
 }
 
+.dashboard-btn-logout {
+    margin-top: 20px;
+    margin-left: 30px;
+    padding: 10px;
+    border: 1px solid #000;
+    border-radius: 10px;
+}
+
+.dashboard-btn-logout:hover {
+    background-color: #658497;
+    transition: all 0.4s;
+}
+
 
 /*[ PADDING ]
 ///////////////////////////////////////////////////////////

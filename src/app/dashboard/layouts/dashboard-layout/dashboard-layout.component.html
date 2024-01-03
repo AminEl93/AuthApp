@@ -1,4 +1,4 @@
-<h1 class="m-t-20 m-l-30 m-b-10">Dashboard</h1>
+<h1 class="m-t-20 m-l-30 m-b-10">Dashboard : {{ user()?.name }}</h1>
 
 <hr>
 
@@ -6,3 +6,5 @@
     <h3>Usuario</h3>
     <pre>{{ user() | json }}</pre>
 </div>
+
+<button class="dashboard-btn-logout" (click)="onLogout()">Cerrar sesión</button>
