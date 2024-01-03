@@ -3,7 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from 'src/environments/environments';
 import { Observable, catchError, map, of, tap, throwError } from 'rxjs';
 
-import { User, LoginResponse, AuthStatus, CheckTokenResponse } from '../interfaces';
+import { User, LoginResponse, RegisterResponse, AuthStatus, CheckTokenResponse } from '../interfaces';
 
 @Injectable({
     providedIn: 'root'
@@ -34,10 +34,22 @@ export class AuthService {
         return true;
     }    
 
+    // Login del usuario
     login(email: string, password: string): Observable<boolean> {
         const url = `${this.baseUrl}/auth/login`;
         const body = { email, password };
         return this._http.post<LoginResponse>(url, body)
+            .pipe(
+                map( ({ user, token }) => this.setAuthentication(user, token) ),
+                catchError( err => throwError(() => err.error.message) )
+            );
+    }
+
+    // Registro del usuario
+    register(name: string, email: string, password: string): Observable<boolean> {
+        const url = `${this.baseUrl}/auth/register`;
+        const body = { name, email, password };     
+        return this._http.post<RegisterResponse>(url, body)
             .pipe(
                 map( ({ user, token }) => this.setAuthentication(user, token) ),
                 catchError( err => throwError(() => err.error.message) )
@@ -66,6 +78,7 @@ export class AuthService {
             );
     }
     
+    // Cerrar sesión del usuario
     logout() {
         localStorage.removeItem('token');
         this._currentUser.set(null);
